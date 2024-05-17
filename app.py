@@ -1,5 +1,5 @@
 import pickle
-
+import json
 import pyxel
 import socket
 
@@ -33,8 +33,8 @@ class Client:
         self.send_text(f"/handshake f{self.pseudo}")
         print(self.recv_text())
 
-    def send_object(self, data):
-        self.sock.send(pickle.dumps(data))
+    def send_object(self, data: dict):
+        self.sock.send(json.dumps(data).encode('utf-8'))
 
     def send_text(self, text: str):
         self.sock.send(text.encode('utf-8'))
@@ -43,7 +43,7 @@ class Client:
         data = self.sock.recv(1024)
         if not data:
             return None
-        return pickle.loads(data)
+        return json.loads(data)
 
     def recv_text(self):
         return self.sock.recv(1024).decode('utf-8')

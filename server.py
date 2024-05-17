@@ -47,6 +47,7 @@ class ClientThread:
             try:
                 self.pseudo = handshake.split(" ")[1]
                 self.lobby.ready[self.id] = {"pseudo": self.pseudo, "status": "connected"}
+                print(self.lobby)
                 self.send_data("connected to the server")
                 self.start_menu()
             except IndexError:
@@ -65,7 +66,7 @@ class ClientThread:
         req = self.recv_data()
 
         while req:
-            req = self.recv_data()
+            print(f"Reception de {self.id}: {req}")
             if req == "/jlist":
                 self.send_data(json.dumps(self.lobby.clients))
 
@@ -84,6 +85,10 @@ class ClientThread:
                     self.join_party(party)
                 except IndexError or ValueError:
                     self.close()
+
+            if req:
+                self.send_data("Votre requête n'a pas abouti")
+            req = self.recv_data()
 
         self.close()
 
@@ -136,6 +141,7 @@ class ClientThread:
         self.s_client.send(data.encode("utf-8"))
 
     def close(self):
+        print(f"Le client {self.id} {self.pseudo} est mort")
         self.s_client.close()
         self.lobby.ready.pop(self.id, None)
         self.lobby.delitem(self.c_address)

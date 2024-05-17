@@ -89,6 +89,8 @@ class App:
         self.client.send_text("/plist")
         plist = self.client.recv_object()
         print(plist)
+        print(type(plist))
+        print("OKKKKKKK")
         if not plist:
             self.client.send_text("/create")
             print(self.client.recv_text())

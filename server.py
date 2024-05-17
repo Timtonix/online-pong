@@ -45,7 +45,7 @@ class ClientThread:
         handshake = self.recv_data()
         if "/handshake" in handshake:
             try:
-                self.ppseudo = handshake.split(" ")[1]
+                self.pseudo = handshake.split(" ")[1]
                 self.lobby.ready[self.id] = {"pseudo": self.pseudo, "status": "connected"}
                 self.send_data("connected to the server")
                 self.start_menu()
@@ -68,6 +68,9 @@ class ClientThread:
             req = self.recv_data()
             if req == "/jlist":
                 self.send_data(json.dumps(self.lobby.clients))
+
+            if req == "/plist":
+                self.send_data(json.dumps(self.lobby.party))
 
             if req == "/create" and self.lobby.ready[self.id]["status"] != Status.ingame:
                 # on va créer une partie et le mettre dedans.
@@ -109,12 +112,12 @@ class ClientThread:
         p_object = self.recv_object()
 
         if not p_object:
-            self.close
+            self.close()
 
         party = Party(player1=p_object.player, player2=None, backgound=p_object.background, level=0,
                       status=Status.waiting)
         self.lobby.party.append(party)
-        self.lobby.ready[self.id]["status"][Status.waiting]
+        self.lobby.ready[self.id]["status"] = Status.waiting
 
     def recv_data(self):
         data = self.s_client.recv(1024).decode("utf-8")
